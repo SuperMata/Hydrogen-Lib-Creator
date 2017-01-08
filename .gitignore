@@ -1,0 +1,14 @@
+.idea/*
+out/production/*
+out/artifacts/hydrolibCreator/hydrolibCreator.html
+out/artifacts/hydrolibCreator/hydrolibCreator.jar
+out/artifacts/hydrolibCreator/hydrolibCreator.jnlp
+out/artifacts/hydrolibCreator/lib
+out/artifacts/hydrolibCreator/hydrolibCreator.html
+out/artifacts/hydrolibCreator/bundles/hydrolibcreator-1.1.deb
+out/artifacts/hydrolibCreator/bundles/hydrolibCreator.jar
+out/artifacts/hydrolibCreator/bundles/lib
+out/artifacts/hydrolibCreator/bundles/hydrolibcreator-1.1-1.x86_64.rpm
+out/artifacts/hydrolibCreator/bundles/hydrolibCreator.html
+out/artifacts/hydrolibCreator/bundles/hydrolibCreator.jnlp
+hydrolibCreator.iml
