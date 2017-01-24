@@ -41,7 +41,7 @@ public class Creator {
         if(!sourceDir.exists())
             throw new ApplicationException("No such directory exists", "please make sure you have the correct path to the library");
 
-        destinationDir = new File(audioLibrary.getDirectorypath()+"/"+sourceDir.getName()+"_HLIB");
+        destinationDir = this.newDestinationDir(sourceDir.getName());
         this.destinationPath = destinationDir.getPath();
 
         audioLibrary.setNewLibPath(this.destinationPath);
@@ -339,4 +339,12 @@ public class Creator {
         return instrumentList;
     }
 
+    private File newDestinationDir(String drumKitName) {
+        String destinationDirectory = System.getProperty("user.home")
+            .concat("/.hydrogen/data/drumkits/")
+            .concat(drumKitName)
+            .concat("_HLIB");
+
+        return new File(destinationDirectory);
+    }
 }
