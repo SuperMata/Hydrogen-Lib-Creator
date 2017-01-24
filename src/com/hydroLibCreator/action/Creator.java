@@ -7,6 +7,10 @@ package com.hydroLibCreator.action;
 import com.hydroLibCreator.exception.ApplicationException;
 import com.hydroLibCreator.model.AudioLibrary;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,11 +22,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
+import java.util.List;
 
 
 public class Creator {
@@ -79,7 +81,7 @@ public class Creator {
 
         try {
 
-            FileUtils.copyDirectory(sourceDir, destinationDir);
+            FileUtils.copyDirectory(sourceDir, destinationDir, this.audioExtensionFilter());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -339,4 +341,10 @@ public class Creator {
         return instrumentList;
     }
 
+    private FileFilter audioExtensionFilter() {
+        List audioFileExtensions = Arrays.asList(".wav", ".flac" );
+        IOFileFilter audioFileSuffixFilter = new SuffixFileFilter(audioFileExtensions);
+
+        return FileFilterUtils.andFileFilter(FileFileFilter.FILE, audioFileSuffixFilter);
+    }
 }
