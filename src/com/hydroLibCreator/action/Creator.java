@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Creator {
@@ -32,7 +33,7 @@ public class Creator {
     private String destinationPath;
     private File sourceDir;
     private File destinationDir;
-    private String[] audioFileslist;
+    private List<String> audioFileslist;
 
     private AudioLibrary audioLibrary;
 
@@ -60,19 +61,14 @@ public class Creator {
 
     private void setSortedAudioFileslist(){
 
-        this.audioFileslist = sourceDir.list();
+        this.audioFileslist = FileUtils.listFiles(sourceDir, this.audioExtensionFilter(), null)
+            .stream()
+            .map(File::getName)
+            .sorted()
+            .collect(Collectors.toList());
 
-        FilenameFilter filter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return false;
-            }
-        };
-
-        if (audioFileslist == null||audioFileslist.length==-1)
+        if (audioFileslist == null || audioFileslist.isEmpty())
             throw new ApplicationException("Missing Audio Files Exception", "Please make sure your directory has audio files");
-
-        Arrays.sort(audioFileslist);
 
     }
 
@@ -341,11 +337,9 @@ public class Creator {
         return instrumentList;
     }
 
-    private FileFilter audioExtensionFilter() {
+    private IOFileFilter audioExtensionFilter() {
         List audioFileExtensions = Arrays.asList(".wav", ".flac");
-        IOFileFilter audioFileSuffixFilter = new SuffixFileFilter(audioFileExtensions);
-
-        return FileFilterUtils.andFileFilter(FileFileFilter.FILE, audioFileSuffixFilter);
+        return new SuffixFileFilter(audioFileExtensions);
     }
 
     private File newDestinationDir(String drumKitName) {
