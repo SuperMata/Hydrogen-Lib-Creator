@@ -7,6 +7,10 @@ package com.hydroLibCreator.action;
 import com.hydroLibCreator.exception.ApplicationException;
 import com.hydroLibCreator.model.AudioLibrary;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -18,11 +22,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class Creator {
@@ -30,7 +33,7 @@ public class Creator {
     private String destinationPath;
     private File sourceDir;
     private File destinationDir;
-    private String[] audioFileslist;
+    private List<String> audioFileslist;
 
     private AudioLibrary audioLibrary;
 
@@ -41,7 +44,7 @@ public class Creator {
         if(!sourceDir.exists())
             throw new ApplicationException("No such directory exists", "please make sure you have the correct path to the library");
 
-        destinationDir = new File(audioLibrary.getDirectorypath()+"/"+sourceDir.getName()+"_HLIB");
+        destinationDir = this.newDestinationDir(sourceDir.getName());
         this.destinationPath = destinationDir.getPath();
 
         audioLibrary.setNewLibPath(this.destinationPath);
@@ -58,19 +61,14 @@ public class Creator {
 
     private void setSortedAudioFileslist(){
 
-        this.audioFileslist = sourceDir.list();
+        this.audioFileslist = FileUtils.listFiles(sourceDir, this.audioExtensionFilter(), null)
+            .stream()
+            .map(File::getName)
+            .sorted()
+            .collect(Collectors.toList());
 
-        FilenameFilter filter = new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return false;
-            }
-        };
-
-        if (audioFileslist == null||audioFileslist.length==-1)
+        if (audioFileslist == null || audioFileslist.isEmpty())
             throw new ApplicationException("Missing Audio Files Exception", "Please make sure your directory has audio files");
-
-        Arrays.sort(audioFileslist);
 
     }
 
@@ -79,7 +77,7 @@ public class Creator {
 
         try {
 
-            FileUtils.copyDirectory(sourceDir, destinationDir);
+            FileUtils.copyDirectory(sourceDir, destinationDir, this.audioExtensionFilter());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -339,4 +337,17 @@ public class Creator {
         return instrumentList;
     }
 
+    private IOFileFilter audioExtensionFilter() {
+        List audioFileExtensions = Arrays.asList(".wav", ".flac");
+        return new SuffixFileFilter(audioFileExtensions);
+    }
+
+    private File newDestinationDir(String drumKitName) {
+        String destinationDirectory = System.getProperty("user.home")
+            .concat("/.hydrogen/data/drumkits/")
+            .concat(drumKitName)
+            .concat("_HLIB");
+
+        return new File(destinationDirectory);
+    }
 }
